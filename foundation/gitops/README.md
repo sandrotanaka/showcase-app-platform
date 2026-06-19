@@ -15,7 +15,7 @@ reconciles the whole platform from Git.
 
 ## Environment values consumed
 
-From [../../docs/ENVIRONMENT.md](../../docs/ENVIRONMENT.md):
+From [../../docs/ENVIRONMENT.example.md](../../docs/ENVIRONMENT.example.md):
 - GitOps operator channel (§2)
 - This repo URL + default branch (§7)
 - Namespaces (§3)

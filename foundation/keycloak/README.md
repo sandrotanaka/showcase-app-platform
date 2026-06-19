@@ -16,7 +16,7 @@ users, and OIDC clients that Connectivity Link and Developer Hub integrate with.
 
 ## Environment values consumed
 
-From [../../docs/ENVIRONMENT.md](../../docs/ENVIRONMENT.md):
+From [../../docs/ENVIRONMENT.example.md](../../docs/ENVIRONMENT.example.md):
 - Keycloak operator channel (§2)
 - Keycloak namespace (§3)
 - Realm name, OIDC issuer URL, client IDs (§4)

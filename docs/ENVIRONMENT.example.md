@@ -1,4 +1,20 @@
-# Environment Fact Sheet
+# Environment Fact Sheet (template)
+
+> **This is the versioned template — placeholders only, no real values.**
+> Copy it to your local, gitignored fact sheet and fill that one in:
+>
+> ```bash
+> cp docs/ENVIRONMENT.example.md docs/ENVIRONMENT.local.md
+> ```
+>
+> `ENVIRONMENT.local.md` is in `.gitignore` and never leaves your machine. It
+> holds **sensitive-but-not-secret identifiers** (hosts, URLs, admin user names,
+> realm, client IDs). True secrets (passwords, client secrets, tokens) do not go
+> even there — they go in a local `secret.env` and are applied via
+> `oc create secret ... --dry-run=client -o yaml | oc apply -f -`.
+>
+> See the data-classification rules in
+> [architecture.md](architecture.md#data-classification).
 
 This is the **single place to record the concrete details of your target
 environment** as you discover them. Fill it in incrementally. The foundation

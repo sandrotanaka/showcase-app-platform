@@ -15,7 +15,7 @@ RateLimitPolicy that protect solution APIs, validating tokens against Keycloak.
 
 ## Environment values consumed
 
-From [../../docs/ENVIRONMENT.md](../../docs/ENVIRONMENT.md):
+From [../../docs/ENVIRONMENT.example.md](../../docs/ENVIRONMENT.example.md):
 - Connectivity Link operator channel (§2)
 - GatewayClass, shared Gateway name, listener host (§5)
 - Keycloak OIDC issuer URL (§4) — for AuthPolicy

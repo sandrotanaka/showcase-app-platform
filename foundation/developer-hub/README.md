@@ -17,7 +17,7 @@ Keycloak (OIDC).
 
 ## Environment values consumed
 
-From [../../docs/ENVIRONMENT.md](../../docs/ENVIRONMENT.md):
+From [../../docs/ENVIRONMENT.example.md](../../docs/ENVIRONMENT.example.md):
 - RHDH operator channel (§2)
 - Developer Hub namespace (§3)
 - Developer Hub route/host, auth provider (§6)

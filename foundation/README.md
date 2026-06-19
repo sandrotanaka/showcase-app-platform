@@ -6,7 +6,7 @@ Solutions in `../solutions/` are built on top of these.
 This initial repo contains only the **skeleton and notes** for each foundation
 component — the manifests are added in a later phase. Each folder's README
 states what will live there, its **sync wave** (install order), and which
-[ENVIRONMENT.md](../docs/ENVIRONMENT.md) values it will consume.
+[ENVIRONMENT.example.md](../docs/ENVIRONMENT.example.md) values it will consume.
 
 ## Components and install order
 

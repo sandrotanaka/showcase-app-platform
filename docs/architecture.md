@@ -68,7 +68,7 @@ follow.
 - **GitOps-delivered.** Git is the source of truth; apply the root once.
 - **Externalize everything.** No environment-specific values or secrets in Git —
   config via ConfigMaps, secrets applied idempotently (see below). See
-  [ENVIRONMENT.md](ENVIRONMENT.md).
+  [ENVIRONMENT.example.md](ENVIRONMENT.example.md).
 - **Portable.** No hardcoded Route hosts, no named StorageClass, public images.
 - **Grows by addition.** New solutions copy `solutions/_template/` and declare
   their foundation integrations in a requisites contract.
@@ -103,7 +103,7 @@ by default and are handled deliberately.
 - **Operators are version-pinned.** Subscriptions use
   `installPlanApproval: Manual` with a pinned `startingCSV`, so the same version
   installs on every run rather than drifting to "latest". Confirm the CSV exists
-  on the target cluster's catalog (see [ENVIRONMENT.md](ENVIRONMENT.md) §2).
+  on the target cluster's catalog (see [ENVIRONMENT.example.md](ENVIRONMENT.example.md) §2).
 - **Namespaces created by Argo CD.** Applications use `CreateNamespace=true`
   rather than a separate manual namespace step.
 - **Sync policy retries.** Because a CR may be reconciled before its CRD is
@@ -117,3 +117,25 @@ Re-applying the root App-of-Apps, re-running any solution's deploy commands, or
 letting Argo CD reconcile repeatedly must never error and must always land on the
 same state. If a step can fail on its second run, it is a bug to fix, not a step
 to run carefully.
+
+## Data classification
+
+Nothing sensitive about the target environment is committed to Git. Every value
+falls into one of three tiers, handled differently:
+
+| Tier | Examples | Where it lives | In Git? |
+|------|----------|----------------|---------|
+| **Secret** | passwords, client secrets, tokens, kubeconfig, keys | local `secret.env` → `oc create secret ... --dry-run=client -o yaml \| oc apply -f -` | **Never** |
+| **Sensitive identifier** | cluster API/apps hosts, route URLs, admin/user names, realm name, OIDC issuer, client IDs | local `docs/ENVIRONMENT.local.md` (gitignored); injected into the cluster via ConfigMap/Secret, referenced by manifests as parameters | **Never literally** — manifests use placeholders/refs, not the real value |
+| **Non-sensitive** | OpenShift version, operator channels/CSV, replica counts, sync waves | versioned files (`ENVIRONMENT.example.md`, manifests) | Yes |
+
+Practical rules:
+
+- The versioned fact sheet is **`docs/ENVIRONMENT.example.md`** — placeholders
+  only. Your real values go in **`docs/ENVIRONMENT.local.md`** (gitignored).
+- Manifests **never hardcode** a sensitive identifier. A value the platform
+  genuinely needs (e.g. the Keycloak issuer for RHDH) is supplied at deploy time
+  from a ConfigMap/Secret created on the cluster, so the repo stays publishable
+  without exposing the environment.
+- When in doubt, treat it as at least a **sensitive identifier** and keep it out
+  of Git.

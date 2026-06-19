@@ -11,3 +11,9 @@ config.env
 .idea/
 .vscode/
 *.log
+
+# Real environment fact sheet (sensitive identifiers: hosts, URLs, users, realm).
+# Keep your real values here, OUT of Git. Copy from docs/ENVIRONMENT.example.md.
+docs/ENVIRONMENT.local.md
+*.local.md
+*.local.env

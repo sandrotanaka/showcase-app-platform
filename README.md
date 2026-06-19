@@ -24,9 +24,12 @@ install-ordering (sync waves) rationale.
 
 ## Start here
 
-1. **Record your environment.** Fill in [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md)
-   as you confirm values on your cluster (versions, domains, namespaces, realm,
-   clients). This is the source of truth the foundation manifests will consume.
+1. **Record your environment.** Copy the template to a local, gitignored fact
+   sheet and fill *that* in — never the template:
+   `cp docs/ENVIRONMENT.example.md docs/ENVIRONMENT.local.md`. It holds your
+   cluster's identifiers (hosts, namespaces, realm, client IDs); true secrets go
+   in a local `secret.env`, not even there. Nothing sensitive is committed —
+   see [data classification](docs/architecture.md#data-classification).
 2. **Read the design.** [docs/architecture.md](docs/architecture.md).
 3. **Browse the skeleton.** [foundation/](foundation/) (one folder per component,
    each with a README describing what it will contain and its sync wave) and
@@ -40,7 +43,8 @@ showcase-app-platform/
 ├── LICENSE
 ├── .gitignore                     # blocks real .env/secret values; keeps *.example
 ├── docs/
-│   ├── ENVIRONMENT.md             # <- fill this in: your concrete environment data
+│   ├── ENVIRONMENT.example.md      # versioned template (placeholders only)
+│   ├── ENVIRONMENT.local.md        # YOUR real values (gitignored, never pushed)
 │   └── architecture.md            # layered design + install ordering
 ├── foundation/                    # shared services, installed once (skeleton for now)
 │   ├── README.md
