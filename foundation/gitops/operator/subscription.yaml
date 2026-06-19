@@ -1,0 +1,24 @@
+# Red Hat OpenShift GitOps operator — installed BY HAND, once (the bootstrap).
+# This is the one operator not managed by Argo CD itself: Argo CD can't install
+# the operator that creates Argo CD (the chicken-and-egg). See
+# ../../docs/architecture.md (GitOps bootstrap decision).
+#
+# Pinned for idempotency/reproducibility: channel + startingCSV fixed,
+# installPlanApproval: Manual. Values mirror scripts/foundation-versions.env:
+#   GITOPS_CHANNEL=gitops-1.20
+#   GITOPS_CSV=openshift-gitops-operator.v1.20.4
+#
+# The operator is cluster-scoped and installed into openshift-operators, which
+# already has a global OperatorGroup — so no OperatorGroup is created here.
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  name: openshift-gitops-operator
+  namespace: openshift-operators
+spec:
+  channel: gitops-1.20
+  installPlanApproval: Manual          # pinned: no silent upgrades
+  name: openshift-gitops-operator
+  source: redhat-operators
+  sourceNamespace: openshift-marketplace
+  startingCSV: openshift-gitops-operator.v1.20.4

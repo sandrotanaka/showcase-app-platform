@@ -1,0 +1,51 @@
+# AppProject "showcase" — the scope/guardrail for everything Argo CD manages
+# here. The root App-of-Apps and every foundation/solution Application belong to
+# this project, so these rules apply uniformly.
+#
+# Applied by hand once (part of the minimal bootstrap), into the openshift-gitops
+# namespace where the default Argo CD instance lives.
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: showcase
+  namespace: openshift-gitops
+spec:
+  description: Showcase app platform — foundation and solutions.
+
+  # Only sync from your own GitHub account. Prevents a stray config from
+  # pointing Argo CD at an arbitrary external repo.
+  sourceRepos:
+    - https://github.com/sandrotanaka/*
+
+  # Where Applications may deploy: the foundation namespaces, all showcase-*
+  # solution namespaces, and openshift-gitops itself (for the ApplicationSet/
+  # root resources). Same cluster only.
+  destinations:
+    - namespace: openshift-gitops
+      server: https://kubernetes.default.svc
+    - namespace: showcase-*
+      server: https://kubernetes.default.svc
+    - namespace: showcase-keycloak
+      server: https://kubernetes.default.svc
+    - namespace: showcase-devhub
+      server: https://kubernetes.default.svc
+    # Operators installed via GitOps land in openshift-operators.
+    - namespace: openshift-operators
+      server: https://kubernetes.default.svc
+
+  # Cluster-scoped resources Argo CD is allowed to create. Namespace (for
+  # CreateNamespace) plus the OLM types, since the foundation installs operators.
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+    - group: operators.coreos.com
+      kind: Subscription
+    - group: operators.coreos.com
+      kind: OperatorGroup
+    - group: operators.coreos.com
+      kind: ClusterServiceVersion
+
+  # All namespaced resources are allowed.
+  namespaceResourceWhitelist:
+    - group: "*"
+      kind: "*"

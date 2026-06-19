@@ -1,0 +1,41 @@
+# Root App-of-Apps. The ONLY Application applied by hand (besides the repo Secret,
+# the operator Subscription, and the AppProject). It makes Argo CD manage the
+# foundation/apps/ path of this repo — a directory of child Applications, one per
+# foundation component. From there Argo CD reconciles everything declaratively.
+#
+# Adding a foundation component later = dropping its Application file into
+# foundation/apps/ (no edit here). Phase 1 fills it with keycloak + developer-hub.
+#
+# Idempotency: automated sync (prune + selfHeal), CreateNamespace, and a retry
+# backoff so a CR applied before its CRD is established heals on a later pass.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: showcase-root
+  namespace: openshift-gitops
+  finalizers:
+    # Clean up child Applications if this root is ever deleted.
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: showcase
+  source:
+    repoURL: https://github.com/sandrotanaka/showcase-app-platform.git
+    targetRevision: main
+    path: foundation/apps          # directory of child Argo CD Applications
+    directory:
+      recurse: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: openshift-gitops
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 15s
+        factor: 2
+        maxDuration: 5m

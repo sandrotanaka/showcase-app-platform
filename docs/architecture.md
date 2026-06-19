@@ -139,3 +139,19 @@ Practical rules:
   without exposing the environment.
 - When in doubt, treat it as at least a **sensitive identifier** and keep it out
   of Git.
+
+## GitOps bootstrap decision (operator installed by hand)
+
+The OpenShift GitOps **operator** is installed manually (one `oc apply` of a
+pinned Subscription), not via GitOps. This resolves the chicken-and-egg problem:
+Argo CD cannot install the operator that creates Argo CD. The minimal by-hand
+bootstrap is therefore: the operator Subscription, the `showcase` AppProject, the
+private-repo access Secret, and the root App-of-Apps. Everything after that —
+the foundation components and the solutions — is reconciled by Argo CD from Git.
+
+This is a deliberate, documented choice: it keeps the bootstrap small and
+teachable, and the "impurity" of the operator living outside Git is acceptable
+for a single-cluster showcase. The platform uses the **default** Argo CD instance
+the operator creates in `openshift-gitops` (no dedicated instance). The exact
+steps live in
+[foundation/gitops/bootstrap/README.md](../foundation/gitops/bootstrap/README.md).

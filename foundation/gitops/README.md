@@ -5,15 +5,26 @@ reconciles the whole platform from Git.
 
 **Sync wave:** prerequisite (must exist before any Application is reconciled).
 
-## Will contain (phase 1)
+## Contents (phase 1)
 
-- `operator/` — Subscription for the OpenShift GitOps operator, pinned:
-  channel `gitops-1.20`, `startingCSV: openshift-gitops-operator.v1.20.4`,
-  `installPlanApproval: Manual` (idempotent, reproducible).
-- `project.yaml` — Argo CD `AppProject` "showcase" (allowed source repos and
-  destinations: `showcase-*` plus the foundation namespaces).
-- `root-app.yaml` — the App-of-Apps root Application, **applied by hand once**,
-  which then manages the foundation and the solutions.
+- `operator/subscription.yaml` — Subscription for the OpenShift GitOps operator,
+  pinned: channel `gitops-1.20`, `startingCSV: openshift-gitops-operator.v1.20.4`,
+  `installPlanApproval: Manual`. Installed **by hand** (the operator can't be
+  installed by the Argo CD it creates — see the bootstrap decision in
+  [../../docs/architecture.md](../../docs/architecture.md)).
+- `project.yaml` — Argo CD `AppProject` "showcase": allowed source repos and
+  destinations (`showcase-*` + foundation namespaces + `openshift-operators`).
+- `bootstrap/root-app.yaml` — the App-of-Apps root Application, **applied by hand
+  once**, watching `foundation/apps/`.
+- `bootstrap/README.md` — the exact, idempotent manual bootstrap sequence.
+- `../apps/` — directory of child Applications the root watches (phase 1 adds
+  Keycloak + Developer Hub here).
+
+## Bootstrap
+
+The minimal by-hand steps (operator → approve → AppProject → repo Secret → root
+app) are in **[bootstrap/README.md](bootstrap/README.md)**. Run
+`./scripts/check-prerequisites.sh` first.
 
 ## Repository access (private repo)
 
