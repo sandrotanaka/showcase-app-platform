@@ -16,7 +16,7 @@
 #
 # Variables required (see secret.env.example):
 #   SHOWCASE_ADMIN_PASSWORD, SHOWCASE_USER_PASSWORD
-apiVersion: k8s.keycloak.org/v2alpha1
+apiVersion: k8s.keycloak.org/v2beta1
 kind: KeycloakRealmImport
 metadata:
   name: showcase-realm

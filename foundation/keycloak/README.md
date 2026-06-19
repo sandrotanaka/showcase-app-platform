@@ -71,5 +71,7 @@ Consumed/produced (see `../../docs/ENVIRONMENT.example.md` §4):
 
 ## Version note
 
-RHBK 26 CR fields (`Keycloak`, `KeycloakRealmImport`) can vary by version. Points
-to confirm against your operator are marked with `CONFIRM` in the manifests.
+RHBK 26 manifests use `k8s.keycloak.org/v2beta1` (confirmed against the installed
+CRD on OpenShift). The ephemeral DB is set via `additionalOptions: db=dev-file`
+(v2beta1 has no `db.vendor: dev-file`). If you run a different RHBK version,
+check `oc explain keycloak.spec --api-version=k8s.keycloak.org/v2beta1`.

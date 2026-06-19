@@ -1,11 +1,10 @@
-# Keycloak instance (RHBK 26) — wave 1.
+# Keycloak instance (RHBK 26, v2beta1) — wave 1.
 # Ephemeral by design: no persistent DB. The realm/client/users are declarative
-# (see realm.yaml), so the meaningful state is reconciled from Git on every boot.
-# A restart loses only manual-console state and sessions — which we don't keep.
+# (see realm.yaml.tpl), so the meaningful state is reconciled from Git on every
+# boot. A restart loses only manual-console state and sessions — which we don't keep.
 #
-# ⚠️ VERSION-SENSITIVE: RHBK 26 Keycloak CR fields. Confirm against your operator
-# version (especially the `db`, `http`, and `hostname` blocks). Marked points below.
-apiVersion: k8s.keycloak.org/v2alpha1
+# v2beta1 schema confirmed against the installed CRD (RHBK 26.6.3).
+apiVersion: k8s.keycloak.org/v2beta1
 kind: Keycloak
 metadata:
   name: showcase
@@ -15,34 +14,29 @@ metadata:
 spec:
   instances: 1
 
-  # --- Database: dev-mode / ephemeral ---------------------------------------
-  # ⚠️ CONFIRM: RHBK 26 expects a `db` block. `vendor: dev-file` / dev-mem runs
-  # an embedded H2 store (no external Postgres, no PVC) — ephemeral. If your
-  # version rejects this, the alternative is a Postgres Deployment + `db.vendor:
-  # postgres`. For this showcase we want ephemeral.
-  db:
-    vendor: dev-file
+  # --- Database: ephemeral (no Postgres, no PVC) ----------------------------
+  # In v2beta1 there is no `db.vendor: dev-file`. The dev-mode file store is set
+  # via a server option through additionalOptions. This keeps the instance
+  # ephemeral; to make it persistent later, replace this with a `db:` block
+  # (vendor: postgres + host/url + credential secrets).
+  additionalOptions:
+    - name: db
+      value: dev-file
+    # Trust the edge proxy (TLS terminates at the OpenShift Route).
+    - name: proxy-headers
+      value: xforwarded
 
-  # --- HTTP/TLS: terminate TLS at the OpenShift edge Route ------------------
-  # We let OpenShift's Route do edge TLS, so Keycloak itself serves HTTP and
-  # trusts the edge. This is the simplest portable setup.
+  # --- HTTP: serve plain HTTP; TLS terminates at the OpenShift edge Route ----
   http:
     httpEnabled: true
 
   # --- Hostname: derived from the cluster, not hardcoded --------------------
-  # ⚠️ CONFIRM: in RHBK 26 the hostname block changed. Leaving strict hostname
-  # off and letting the Route host drive it keeps this portable across clusters.
+  # strict: false lets Keycloak resolve the hostname from request headers, so we
+  # don't pin a cluster-specific host here (portable). The actual host is the
+  # Route the operator creates; record it in ENVIRONMENT.local §4 after install.
   hostname:
     strict: false
 
-  # --- Expose via an OpenShift edge Route (operator-managed) ----------------
-  # The operator can create the Route; edge termination + redirect.
+  # --- Expose via the operator-managed ingress (OpenShift Route) ------------
   ingress:
     enabled: true
-  # NOTE: no spec.hostname value -> OpenShift assigns the host from the cluster
-  # domain (portable). The actual host is recorded in ENVIRONMENT.local.md §4
-  # after install.
-
-  # Ephemeral: 1 replica, modest resources. Proxy mode for edge TLS.
-  proxy:
-    headers: xforwarded
