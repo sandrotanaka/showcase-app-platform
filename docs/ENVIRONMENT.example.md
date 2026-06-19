@@ -60,6 +60,25 @@ OperatorHub. Confirm each before pinning it in a Subscription.
 > installs on every run. Confirm each pinned CSV actually exists in your
 > cluster's catalog before committing it.
 
+### Reference pins (phase 1 — confirm on your cluster)
+
+These were confirmed against the Red Hat / community catalogs and are the
+intended pins. They are catalog facts (not environment-specific), so they are
+versioned here as the default to verify against. Re-run the `oc get
+packagemanifest` commands above; if your catalog differs, prefer your cluster's
+values.
+
+| Operator | Channel | startingCSV |
+|----------|---------|-------------|
+| Red Hat OpenShift GitOps | `gitops-1.20` | `openshift-gitops-operator.v1.20.4` |
+| Red Hat build of Keycloak (RHBK) | `stable-v26.6` | `rhbk-operator.v26.6.3-opr.1` |
+| Red Hat Developer Hub (RHDH) | `fast-1.10` | `rhdh-operator.v1.10.1` |
+| Connectivity Link — **deferred (phase 2)** | _(Kuadrant community)_ `stable` | `kuadrant-operator.v0.11.1` |
+
+> **Connectivity Link is phase 2.** On a workshop cluster only the upstream
+> Kuadrant community operator (pre-1.0) is available — not the Red Hat product.
+> Phase 1 ships GitOps + Keycloak + Developer Hub.
+
 ## 3. Namespaces
 
 | Purpose | Namespace | Notes |
