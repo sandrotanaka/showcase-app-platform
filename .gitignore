@@ -17,3 +17,9 @@ config.env
 docs/ENVIRONMENT.local.md
 *.local.md
 *.local.env
+
+# Argo CD repo-access credentials (PAT / SSH deploy key) — never commit
+foundation/gitops/repo-secret.env
+*deploy_key*
+*.pem
+sshPrivateKey
