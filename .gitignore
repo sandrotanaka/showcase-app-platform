@@ -1,0 +1,13 @@
+# Never commit real environment values or secrets.
+# Only *.example files (keys, no values) belong in Git.
+*.env
+!*.env.example
+*.secret.env
+secret.env
+config.env
+.DS_Store
+
+# Local tooling
+.idea/
+.vscode/
+*.log
