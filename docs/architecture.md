@@ -67,8 +67,53 @@ follow.
 
 - **GitOps-delivered.** Git is the source of truth; apply the root once.
 - **Externalize everything.** No environment-specific values or secrets in Git —
-  config via ConfigMaps, secrets via `oc create secret`. See
+  config via ConfigMaps, secrets applied idempotently (see below). See
   [ENVIRONMENT.md](ENVIRONMENT.md).
 - **Portable.** No hardcoded Route hosts, no named StorageClass, public images.
 - **Grows by addition.** New solutions copy `solutions/_template/` and declare
   their foundation integrations in a requisites contract.
+
+## Idempotency (a hard requirement)
+
+Every deployment step must be **idempotent**: running it once or many times
+converges to the same result, with no "already exists" failures and no
+duplicated or drifting state. GitOps gives us most of this for free (declarative,
+`apply`-based, self-healing), but a few pieces of this stack are *not* idempotent
+by default and are handled deliberately.
+
+### Rules every component and solution follows
+
+- **`apply`, never `create`, for manifests.** `oc apply` (server-side apply) is
+  idempotent; `oc create` fails if the object exists. Manifests are always
+  applied, never created.
+- **Declarative CRs, not imperative scripts.** Identity (Keycloak realm/clients)
+  and policies are expressed as operator CRs that reconcile, never as imperative
+  `kcadm`/CLI scripts that error or duplicate on re-run.
+- **Secrets applied idempotently.** Since the *values* are externalized (never in
+  Git), the apply step uses the dry-run-piped-to-apply pattern so it can run any
+  number of times:
+
+  ```bash
+  oc create secret generic <name> \
+    --from-env-file=secret.env \
+    --dry-run=client -o yaml | oc apply -f -
+  ```
+
+  The same pattern applies to ConfigMaps (`oc create configmap ... --dry-run=client -o yaml | oc apply -f -`).
+- **Operators are version-pinned.** Subscriptions use
+  `installPlanApproval: Manual` with a pinned `startingCSV`, so the same version
+  installs on every run rather than drifting to "latest". Confirm the CSV exists
+  on the target cluster's catalog (see [ENVIRONMENT.md](ENVIRONMENT.md) §2).
+- **Namespaces created by Argo CD.** Applications use `CreateNamespace=true`
+  rather than a separate manual namespace step.
+- **Sync policy retries.** Because a CR may be reconciled before its CRD is
+  established (despite sync waves), Applications set automated sync with
+  `retry`/backoff so a later pass heals what an earlier pass could not — making
+  the whole bootstrap re-runnable to convergence.
+
+### The test
+
+Re-applying the root App-of-Apps, re-running any solution's deploy commands, or
+letting Argo CD reconcile repeatedly must never error and must always land on the
+same state. If a step can fail on its second run, it is a bug to fix, not a step
+to run carefully.

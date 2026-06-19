@@ -14,11 +14,19 @@ should walk away understanding.
 |-----|---------|----------|---------|---------|
 | `<KEY>` | ... | no | `...` | `...` |
 
-### Secrets — via `oc create secret`, never in Git
+### Secrets — externalized, applied idempotently, never in Git
+
+Values come from outside Git and are applied with the dry-run|apply pattern so
+the step is re-runnable (see [idempotency](../../docs/architecture.md#idempotency-a-hard-requirement)):
+
+```bash
+oc create secret generic <name> --from-env-file=secret.env \
+  --dry-run=client -o yaml | oc apply -f -
+```
 
 | Key | Purpose | How to provide |
 |-----|---------|----------------|
-| `<KEY>` | ... | `oc create secret generic ...` |
+| `<KEY>` | ... | via `secret.env` (gitignored) + the command above |
 
 ### Cluster prerequisites
 

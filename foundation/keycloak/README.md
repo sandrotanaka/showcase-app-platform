@@ -12,7 +12,7 @@ users, and OIDC clients that Connectivity Link and Developer Hub integrate with.
 - `realm.yaml` — the `showcase` realm (wave 2).
 - `clients.yaml` — OIDC clients for Developer Hub and Connectivity Link.
 - `secret.env.example` — **keys only** for client secrets / admin password;
-  real values created on the cluster via `oc create secret`. Never in Git.
+  real values applied on the cluster via `oc create secret ... --dry-run=client -o yaml | oc apply -f -` (idempotent). Never in Git.
 
 ## Environment values consumed
 

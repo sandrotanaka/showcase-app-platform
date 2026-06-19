@@ -22,3 +22,9 @@ states what will live there, its **sync wave** (install order), and which
 
 The ordering is enforced later with Argo CD `argocd.argoproj.io/sync-wave`
 annotations. See [../docs/architecture.md](../docs/architecture.md).
+
+> **Idempotency:** every component installs via `apply` (never `create`), uses
+> version-pinned Subscriptions (`installPlanApproval: Manual`), and is delivered
+> by Argo CD with `CreateNamespace=true` and sync retries — so the whole
+> bootstrap is re-runnable to convergence. See the idempotency rules in
+> [../docs/architecture.md](../docs/architecture.md#idempotency-a-hard-requirement).

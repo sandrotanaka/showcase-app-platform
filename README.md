@@ -57,7 +57,7 @@ showcase-app-platform/
 
 - **GitOps-delivered** - Git is the source of truth; the root app is applied once.
 - **Externalize everything** - no environment-specific values or secrets in Git;
-  config via ConfigMaps, secrets via `oc create secret`.
+  config via ConfigMaps, secrets applied idempotently (dry-run | apply). Deployment is idempotent — see docs/architecture.md.
 - **Portable** - no hardcoded Route hosts, no named StorageClass, public images.
 - **Grows by addition** - new solutions copy `_template/` and declare their
   foundation integrations in a requisites contract.

@@ -13,7 +13,7 @@ Keycloak (OIDC).
 - `app-config.yaml` (as ConfigMap) — RHDH config: OIDC provider = Keycloak,
   catalog discovery via per-solution `catalog-info.yaml`.
 - `secret.env.example` — keys only for the OIDC client secret; value via
-  `oc create secret`.
+  `oc create secret ... --dry-run=client -o yaml | oc apply -f -` (idempotent).
 
 ## Environment values consumed
 

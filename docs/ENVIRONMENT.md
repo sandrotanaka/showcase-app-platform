@@ -7,7 +7,7 @@ accurately here first keeps everything consistent.
 
 > Rule: this file holds **identifiers and non-secret facts** (versions, domains,
 > namespaces, realm names, client IDs). It must **never** hold passwords, client
-> secrets, or tokens — those are created on the cluster via `oc create secret`
+> secrets, or tokens — those are applied on the cluster via `oc create secret ... --dry-run=client -o yaml | oc apply -f -` (idempotent)
 > and listed by key only in the relevant `*.env.example` files.
 
 Replace every `TODO` / `<...>` as you confirm the value on your cluster.
@@ -38,6 +38,11 @@ OperatorHub. Confirm each before pinning it in a Subscription.
 
 > The exact packagemanifest names depend on your catalog source; the commands
 > above are starting points. Record what you actually find.
+>
+> **Idempotency:** Subscriptions will use `installPlanApproval: Manual` with a
+> pinned `startingCSV` (the "Confirmed CSV" column above), so the same version
+> installs on every run. Confirm each pinned CSV actually exists in your
+> cluster's catalog before committing it.
 
 ## 3. Namespaces
 
@@ -58,7 +63,7 @@ OperatorHub. Confirm each before pinning it in a Subscription.
 | Admin user | `<admin>` | password via Secret, NOT here |
 | OIDC issuer URL | `<https://keycloak.../realms/showcase>` | used by RHDH + Connectivity Link |
 
-### OIDC clients (IDs only — secrets via `oc create secret`)
+### OIDC clients (IDs only — secrets applied idempotently, never here)
 
 | Client ID | Used by | Type | Redirect URIs |
 |-----------|---------|------|---------------|
