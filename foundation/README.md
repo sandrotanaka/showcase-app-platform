@@ -36,3 +36,17 @@ annotations. See [../docs/architecture.md](../docs/architecture.md).
 > by Argo CD with `CreateNamespace=true` and sync retries — so the whole
 > bootstrap is re-runnable to convergence. See the idempotency rules in
 > [../docs/architecture.md](../docs/architecture.md#idempotency-a-hard-requirement).
+
+## Before installing: check prerequisites
+
+Run the read-only checker — it inspects the cluster and reports whether it is
+ready for phase 1 (login, OpenShift ≥ 4.14, default StorageClass, cluster-admin,
+and that the pinned operator CSVs are available in the catalog). It changes
+nothing and is safe to re-run:
+
+```bash
+./scripts/check-prerequisites.sh
+```
+
+Pinned versions live in one place — [`scripts/foundation-versions.env`](../scripts/foundation-versions.env)
+— which the checker reads and the Subscription manifests will reuse.

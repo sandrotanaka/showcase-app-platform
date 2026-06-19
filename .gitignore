@@ -2,6 +2,7 @@
 # Only *.example files (keys, no values) belong in Git.
 *.env
 !*.env.example
+!scripts/foundation-versions.env
 *.secret.env
 secret.env
 config.env
