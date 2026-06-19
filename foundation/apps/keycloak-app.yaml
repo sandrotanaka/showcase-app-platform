@@ -1,0 +1,44 @@
+# Child Application: Keycloak (RHBK) — wave 2 of the foundation.
+# Managed by the root App-of-Apps (watches foundation/apps/).
+#
+# Scope: Argo CD syncs the STATIC, secret-free parts of foundation/keycloak —
+# the operator Subscription/OperatorGroup and the Keycloak instance. It does NOT
+# sync the realm: the realm carries secrets and needs envsubst, so it is applied
+# by hand via scripts/render-keycloak-realm.sh (see bootstrap). This keeps
+# secrets out of the Git/Argo flow.
+#
+# The directory.include below picks up only .yaml manifests, so realm.yaml.tpl
+# (the secret-bearing template) is naturally excluded.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: showcase-keycloak
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: showcase
+  source:
+    repoURL: https://github.com/sandrotanaka/showcase-app-platform.git
+    targetRevision: main
+    path: foundation/keycloak
+    directory:
+      recurse: true
+      include: '{operator/subscription.yaml,instance.yaml}'
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: showcase-keycloak
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 15s
+        factor: 2
+        maxDuration: 5m

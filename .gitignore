@@ -24,3 +24,7 @@ foundation/gitops/repo-secret.env
 *deploy_key*
 *.pem
 sshPrivateKey
+
+# Keycloak realm: rendered (contains secrets) and local secret values
+foundation/keycloak/.realm.rendered.yaml
+foundation/keycloak/secret.env

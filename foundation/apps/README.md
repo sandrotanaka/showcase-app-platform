@@ -15,5 +15,5 @@ Each child Application points at its component's manifests elsewhere under
 | `keycloak-app.yaml` | Keycloak (RHBK) | 2 | `foundation/keycloak` |
 | `developer-hub-app.yaml` | Developer Hub (RHDH) | 4 | `foundation/developer-hub` |
 
-Until those exist, this directory has only this README, so the root app syncs
+`keycloak-app.yaml` is present; `developer-hub-app.yaml` comes next. Until both exist, missing ones simply are not created, so the root app syncs
 cleanly with nothing to create yet.

@@ -1,0 +1,48 @@
+# Keycloak instance (RHBK 26) — wave 1.
+# Ephemeral by design: no persistent DB. The realm/client/users are declarative
+# (see realm.yaml), so the meaningful state is reconciled from Git on every boot.
+# A restart loses only manual-console state and sessions — which we don't keep.
+#
+# ⚠️ VERSION-SENSITIVE: RHBK 26 Keycloak CR fields. Confirm against your operator
+# version (especially the `db`, `http`, and `hostname` blocks). Marked points below.
+apiVersion: k8s.keycloak.org/v2alpha1
+kind: Keycloak
+metadata:
+  name: showcase
+  namespace: showcase-keycloak
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  instances: 1
+
+  # --- Database: dev-mode / ephemeral ---------------------------------------
+  # ⚠️ CONFIRM: RHBK 26 expects a `db` block. `vendor: dev-file` / dev-mem runs
+  # an embedded H2 store (no external Postgres, no PVC) — ephemeral. If your
+  # version rejects this, the alternative is a Postgres Deployment + `db.vendor:
+  # postgres`. For this showcase we want ephemeral.
+  db:
+    vendor: dev-file
+
+  # --- HTTP/TLS: terminate TLS at the OpenShift edge Route ------------------
+  # We let OpenShift's Route do edge TLS, so Keycloak itself serves HTTP and
+  # trusts the edge. This is the simplest portable setup.
+  http:
+    httpEnabled: true
+
+  # --- Hostname: derived from the cluster, not hardcoded --------------------
+  # ⚠️ CONFIRM: in RHBK 26 the hostname block changed. Leaving strict hostname
+  # off and letting the Route host drive it keeps this portable across clusters.
+  hostname:
+    strict: false
+
+  # --- Expose via an OpenShift edge Route (operator-managed) ----------------
+  # The operator can create the Route; edge termination + redirect.
+  ingress:
+    enabled: true
+  # NOTE: no spec.hostname value -> OpenShift assigns the host from the cluster
+  # domain (portable). The actual host is recorded in ENVIRONMENT.local.md §4
+  # after install.
+
+  # Ephemeral: 1 replica, modest resources. Proxy mode for edge TLS.
+  proxy:
+    headers: xforwarded
