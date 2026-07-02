@@ -1,0 +1,23 @@
+# Istio custom resource: deploys and configures the control plane (istiod).
+# The operator creates an IstioRevision from this; name "default" means workload
+# namespaces can opt in with the simple istio-injection=enabled label rather than
+# a revision-specific istio.io/rev label.
+#
+# updateStrategy InPlace: revision updated in place on version bumps (simplest
+# for a showcase). RevisionBased would enable zero-downtime canary upgrades.
+#
+# No spec.version pin: the operator's active CSV (v3.1.0) selects a compatible
+# Istio version. Pin only if a specific data-plane version is required and
+# cross-checked against the CSV.
+#
+# Wave 2: depends on the operator CRD (wave 0) and istio-system (wave 1).
+apiVersion: sailoperator.io/v1
+kind: Istio
+metadata:
+  name: default
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  namespace: istio-system
+  updateStrategy:
+    type: InPlace

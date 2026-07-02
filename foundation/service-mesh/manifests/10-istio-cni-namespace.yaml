@@ -1,0 +1,11 @@
+# Dedicated project for the Istio CNI plugin. Kept separate from the control
+# plane namespace per Red Hat guidance (CNI and control plane in distinct
+# projects). Wave 1: namespaces exist before the CRs that land in them.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-cni
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  labels:
+    kubernetes.io/metadata.name: istio-cni

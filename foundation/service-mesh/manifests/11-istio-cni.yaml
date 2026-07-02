@@ -1,0 +1,13 @@
+# IstioCNI custom resource: deploys the Istio CNI node DaemonSet, which wires
+# pod networking for sidecar/ambient without requiring NET_ADMIN on workloads.
+# Required on OpenShift. Name "default" is the conventional single-instance name.
+#
+# Wave 2: depends on the operator CRD (wave 0) and its namespace (wave 1).
+apiVersion: sailoperator.io/v1
+kind: IstioCNI
+metadata:
+  name: default
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  namespace: istio-cni

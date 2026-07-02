@@ -1,0 +1,12 @@
+# Control plane project. istiod runs here. Kept separate from CNI and from any
+# gateway namespace (gateways will live in their own namespace when a demo adds
+# one, per the best-practice of not colocating gateways with the control plane).
+# Wave 1: exists before the Istio CR.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  labels:
+    kubernetes.io/metadata.name: istio-system

@@ -1,0 +1,54 @@
+# Child Application: Service Mesh (OSSM 3, Sail-based) — wave 1 of the foundation.
+# Managed by the root App-of-Apps (watches foundation/apps/).
+#
+# Scope: the shared mesh CONTROL PLANE only — operator Subscription, IstioCNI,
+# and the Istio control plane. It deliberately excludes demo workloads and
+# gateways; those are separate solutions that consume the mesh, added later
+# without touching this component (growth by addition).
+#
+# Foundation ordering: wave 1 places the mesh early (shared network infra other
+# components may sit on top of), independent of Keycloak (wave 2). Ordering
+# WITHIN this app — operator -> namespaces -> CRs — is handled by sync-wave
+# annotations on the individual manifests under foundation/service-mesh/manifests.
+#
+# The directory.include picks up only the manifests/ folder, so the component
+# README is naturally excluded from the sync.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: showcase-service-mesh
+  namespace: openshift-gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: showcase
+  source:
+    repoURL: https://github.com/sandrotanaka/showcase-app-platform.git
+    targetRevision: main
+    path: foundation/service-mesh
+    directory:
+      recurse: true
+      include: '{manifests/*.yaml}'
+  destination:
+    server: https://kubernetes.default.svc
+    # Default namespace for resources that omit their own; every manifest here
+    # sets its own namespace explicitly (openshift-operators, istio-cni,
+    # istio-system), so this is only a fallback.
+    namespace: istio-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      # The operator owns the CRDs; server-side apply avoids ownership conflicts
+      # on the large Istio/IstioCNI CRs.
+      - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 15s
+        factor: 2
+        maxDuration: 5m
