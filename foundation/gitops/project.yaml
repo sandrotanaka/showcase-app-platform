@@ -50,6 +50,15 @@ spec:
       kind: OperatorGroup
     - group: operators.coreos.com
       kind: ClusterServiceVersion
+    # Service Mesh 3 (Sail): both Istio and IstioCNI CRDs are Cluster-scoped
+    # (the CR is cluster-wide; its spec.namespace only selects where the operator
+    # deploys istiod / the CNI DaemonSet). Cluster-scoped resources are checked
+    # against THIS list, not namespaceResourceWhitelist, so they must be allowed
+    # here explicitly or Argo rejects them ("not permitted in project").
+    - group: sailoperator.io
+      kind: Istio
+    - group: sailoperator.io
+      kind: IstioCNI
 
   # All namespaced resources are allowed.
   namespaceResourceWhitelist:
