@@ -32,6 +32,12 @@ spec:
     # Operators installed via GitOps land in openshift-operators.
     - namespace: openshift-operators
       server: https://kubernetes.default.svc
+    # Service Mesh control plane namespaces (fixed by OSSM convention, so they
+    # cannot follow the showcase-* pattern and are listed explicitly).
+    - namespace: istio-system
+      server: https://kubernetes.default.svc
+    - namespace: istio-cni
+      server: https://kubernetes.default.svc
 
   # Cluster-scoped resources Argo CD is allowed to create. Namespace (for
   # CreateNamespace) plus the OLM types, since the foundation installs operators.
