@@ -43,9 +43,13 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      # The operator owns the CRDs; server-side apply avoids ownership conflicts
-      # on the large Istio/IstioCNI CRs.
-      - ServerSideApply=true
+      # NOTE: ServerSideApply was removed here. With SSA on, Argo runs a
+      # server-side dry-run to compute the diff; for a CR whose CRD is installed
+      # by wave 0 of this same app, that server-side dry-run invalidates the sync
+      # task despite SkipDryRunOnMissingResource on the CRs (which only skips the
+      # client-side dry-run). The two options conflict in this bootstrap case and
+      # deadlock the whole operation. Client-side apply + SkipDryRun is enough;
+      # there is no shared field ownership on these CRs to warrant SSA.
     retry:
       limit: 5
       backoff:
