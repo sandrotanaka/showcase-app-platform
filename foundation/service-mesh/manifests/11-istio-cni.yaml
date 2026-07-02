@@ -9,5 +9,11 @@ metadata:
   name: default
   annotations:
     argocd.argoproj.io/sync-wave: "2"
+    # The sailoperator.io CRD does not exist until the operator (wave 0) installs.
+    # Without this, Argo's pre-sync dry-run marks this task invalid and aborts the
+    # WHOLE operation — including wave 0 — so the operator (and thus the CRD) is
+    # never created. Skipping the missing-resource dry-run lets wave 0 run first;
+    # this CR then applies cleanly in wave 2 once the CRD is established.
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   namespace: istio-cni
